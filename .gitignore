@@ -1,6 +1,31 @@
+# Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 .venv/
 venv/
-.pytest_cache/
+env/
 *.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local wiki data (optional - uncomment to ignore)
+# wiki/
+# raw/
+
+# Logs
+*.log
