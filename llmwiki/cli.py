@@ -4,9 +4,9 @@ CLI entry point for llmwiki.
 from __future__ import annotations
 
 import sys
-from pathlib import Path
 
 from .wiki import init_wiki
+from .ingest import cmd_ingest
 
 
 def cmd_init(args: list[str]) -> int:
@@ -30,6 +30,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if cmd == "init":
         return cmd_init(args)
+    elif cmd == "ingest":
+        return cmd_ingest(args)
     else:
         print(f"Unknown command: {cmd}")
         print("Commands: init, ingest, query, lint, search")

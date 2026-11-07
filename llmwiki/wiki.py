@@ -65,7 +65,10 @@ def _resolve_raw_path(path: str | Path) -> Path:
 
 
 def read_raw(path: str) -> str:
-    """Read a raw source file (markdown or text)."""
+    """Read a raw source file (markdown or text). Accepts paths with or without 'raw/' prefix."""
+    # Strip 'raw/' prefix if present
+    if path.startswith("raw/"):
+        path = path[4:]
     p = _resolve_raw_path(path)
     if not p.exists():
         raise WikiError(f"Raw file not found: {path}")
