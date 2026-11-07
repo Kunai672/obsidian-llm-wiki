@@ -50,13 +50,18 @@ def test_query_empty_wiki():
         try:
             os.chdir(tmpdir)
             init_wiki()
-            setup_fake_backend()
-
-            answer = query_wiki("What is AI?")
-            # The code returns "No relevant pages found for this question." when index is empty but LLM returns empty list
-            assert "relevant pages" in answer.lower() or "empty" in answer.lower() or "init" in answer.lower()
+            # Use a custom FakeLLMClient with empty responses (no demo responses)
+            # to test the empty wiki behavior
+            empty_client = FakeLLMClient({})
+            original_get_client = query_module.get_llm_client
+            query_module.get_llm_client = lambda: empty_client
+            try:
+                answer = query_wiki("What is AI?")
+                # The code returns "No relevant pages found for this question." when index is empty but LLM returns empty list
+                assert "relevant pages" in answer.lower() or "empty" in answer.lower() or "init" in answer.lower()
+            finally:
+                query_module.get_llm_client = original_get_client
         finally:
-            teardown_fake_backend()
             os.chdir(orig_cwd)
 
 

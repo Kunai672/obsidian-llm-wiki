@@ -91,10 +91,71 @@ class FakeLLMClient(LLMClient):
         """Set a canned response for a prompt containing key."""
         self.responses[key] = response
 
+    @classmethod
+    def demo(cls) -> "FakeLLMClient":
+        """Create a FakeLLMClient with demo responses for CLI usage.
+        
+        These responses handle the common prompts from:
+        - ingest: edit proposal prompt
+        - query step 1: page selection prompt
+        - query step 2: answer prompt
+        - lint deep: contradiction check prompt
+        """
+        import yaml
+        
+        def make_page(title: str, ptype: str, summary: str, sources: list[str], tags: list[str], updated: str, body: str) -> str:
+            fm = {"title": title, "type": ptype, "summary": summary, "sources": sources, "tags": tags, "updated": updated}
+            yaml_str = yaml.dump(fm, sort_keys=False).strip()
+            return f"---\n{yaml_str}\n---\n\n{body}"
+
+        # Demo responses keyed by stable prompt markers
+        demo_responses = {
+            # Ingest: "select up to" is in the ingest prompt
+            "Raw source:": json.dumps({
+                "edits": [
+                    {
+                        "path": "sources/demo-source.md",
+                        "action": "create",
+                        "content": make_page(
+                            "Demo Source", "source", "Demo source summary",
+                            ["raw/demo.md"], ["demo"], "2025-01-15",
+                            "This demo source mentions [[demo-entity]] and [[demo-concept]]."
+                        )
+                    },
+                    {
+                        "path": "entities/demo-entity.md",
+                        "action": "create",
+                        "content": make_page(
+                            "Demo Entity", "entity", "A demo entity",
+                            ["raw/demo.md"], ["demo", "entity"], "2025-01-15",
+                            "Demo entity is related to [[demo-concept]]."
+                        )
+                    },
+                    {
+                        "path": "concepts/demo-concept.md",
+                        "action": "create",
+                        "content": make_page(
+                            "Demo Concept", "concept", "A demo concept",
+                            ["raw/demo.md"], ["demo", "concept"], "2025-01-15",
+                            "Demo concept relates to [[demo-entity]]."
+                        )
+                    }
+                ],
+                "log_note": "Created demo source, entity, and concept pages"
+            }),
+            # Query step 1: "select up to" is in the page selection prompt
+            "select up to": '["overview", "demo-entity", "demo-concept"]',
+            # Query step 2: "Answer the question using ONLY" is in the answer prompt
+            "Answer the question using ONLY": "Based on the wiki, the demo entity [[demo-entity]] is a demo entity related to [[demo-concept]]. See also the [[overview]] page.",
+            # Lint deep: "Compare these two wiki pages" is in the deep lint prompt
+            "Compare these two wiki pages": "[]",
+        }
+        return cls(demo_responses)
+
 
 def get_llm_client() -> LLMClient:
     """Get the appropriate LLM client based on environment."""
     backend = os.environ.get("LLMWIKI_BACKEND", "openai")
     if backend == "fake":
-        return FakeLLMClient()
+        return FakeLLMClient.demo()
     return OpenAICompatibleClient()
