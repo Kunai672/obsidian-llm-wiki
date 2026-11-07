@@ -121,6 +121,9 @@ def lint_wiki(deep: bool = False, max_deep_pairs: int = 10) -> tuple[list[str], 
     # Write lint report
     _write_lint_report(findings)
 
+    # Log the lint run
+    append_log("lint", "report")
+
     # Determine exit code
     has_errors = any(f.startswith(("BROKEN_LINK:", "MISSING_FRONTMATTER:")) for f in findings)
     exit_code = 1 if has_errors else 0

@@ -9,6 +9,7 @@ from .wiki import init_wiki
 from .ingest import cmd_ingest
 from .query import cmd_query
 from .lint import cmd_lint
+from .search import cmd_search
 
 
 def cmd_init(args: list[str]) -> int:
@@ -38,6 +39,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_query(args)
     elif cmd == "lint":
         return cmd_lint(args)
+    elif cmd == "search":
+        return cmd_search(args)
     else:
         print(f"Unknown command: {cmd}")
         print("Commands: init, ingest, query, lint, search")
