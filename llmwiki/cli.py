@@ -7,6 +7,7 @@ import sys
 
 from .wiki import init_wiki
 from .ingest import cmd_ingest
+from .query import cmd_query
 
 
 def cmd_init(args: list[str]) -> int:
@@ -32,6 +33,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_init(args)
     elif cmd == "ingest":
         return cmd_ingest(args)
+    elif cmd == "query":
+        return cmd_query(args)
     else:
         print(f"Unknown command: {cmd}")
         print("Commands: init, ingest, query, lint, search")
